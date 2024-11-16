@@ -1,0 +1,35 @@
+# デバッグ時にコメントを外す
+# image:
+#   debug: true
+
+replicaCount: 1
+
+wordpressUsername: testuser
+existingSecret: wordpress-secret  # key: wordpress-password
+
+mariadb:
+  enabled: false
+
+persistence:
+  enabled: false
+
+externalDatabase:
+  host: my-cloud-sql.my-dns
+  port: 3306
+  database: wordpress-database
+  user: db-user
+  existingSecret: wordpress-secret  # key: mariadb-password
+
+service:
+  type: NodePort
+  annotations:  # GCP LB BackendConfig
+    cloud.google.com/backend-config: '{"ports": {"80":"wordpress-backend-config"}}'
+    cloud.google.com/neg: '{"ingress": true}'
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi

@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: wordpress
+resources:
+  - external-secret.yaml
+  - ingress.yaml
+
+helmCharts:
+- name: wordpress
+  repo: https://charts.bitnami.com/bitnami
+  releaseName: wordpress
+  namespace: wordpress
+  version: 23.1.23
+  valuesFile: values.yaml

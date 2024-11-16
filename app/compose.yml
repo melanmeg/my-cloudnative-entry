@@ -1,0 +1,13 @@
+services:
+  golang:
+    build:
+      context: .
+    image: golang:latest
+    container_name: golang
+    hostname: golang
+    ports:
+      - "8080:8080"
+
+networks:
+  default:
+    name: app

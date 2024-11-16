@@ -1,0 +1,109 @@
+server:
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    # -- Average CPU utilization percentage (to the requested resource) for the Argo CD server [HPA]
+    targetCPUUtilizationPercentage: 90
+    # -- Average memory utilization percentage (to the requested resource) for the Argo CD server [HPA]
+    targetMemoryUtilizationPercentage: 175
+  resources:
+    requests:
+      cpu: 100m
+      memory: 48Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+  pdb:
+    enabled: true
+    minAvailable: 1
+    maxUnavailable: 0
+  configEnabled: true
+  # -- [General Argo CD configuration]
+  config:
+    # Argo CD instance label key
+    application.instanceLabelKey: argocd.argoproj.io/instance
+    kustomize.buildOptions: --load-restrictor LoadRestrictionsNone
+  service:
+    type: NodePort
+    annotations:  # GCP LB BackendConfig
+      cloud.google.com/backend-config: '{"ports": {"http":"argocd-backend-config"}}'
+      cloud.google.com/neg: '{"ingress": true}'
+controller:
+  enableStatefulSet: true
+  resources:
+    limits:
+      cpu: 750m
+      memory: 768Mi
+    requests:
+      cpu: 250m
+      memory: 128Mi
+  pdb:
+    enabled: true
+    minAvailable: 1
+    maxUnavailable: 0
+dex:
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  pdb:
+    enabled: true
+    minAvailable: 1
+    maxUnavailable: 0
+redis:
+  resources:
+    limits:
+      cpu: 300m
+      memory: 384Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+repoServer:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 2300m
+      memory: 1024Mi
+    requests:
+      cpu: 1000m
+      memory: 256Mi
+applicationSet:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+notifications:
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+configs:
+  # params:
+  #   server.insecure: true  # httpからhttpsにリダイレクトするのを許可するため
+  cm:
+    # Disable userid/password login and remove from login page
+    admin.enabled: false
+    # dex.config: |
+    #   connectors:
+    #     - type: gitlab
+    #       id: gitlab
+    #       name: Gitlab
+    #       config:
+    #         clientID: xxxxx
+    #         clientSecret: xxxxx
+  rbac:
+    policy.csv: |
+      p, hoge@example.com, applications, *, */*, allow
+      g, example/group, role:admin
+    policy.default: role:readonly
