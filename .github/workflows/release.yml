@@ -25,7 +25,7 @@ defaults:
 env:
   GO_VERSION: 1.23.2
   IMAGE: welcome-study-app
-  WORKLOAD_IDENTITY_PROVIDER: projects/593997455442/locations/global/workloadIdentityPools/my-gitlab-pool/providers/my-gitlab-pool-provider
+  WORKLOAD_IDENTITY_PROVIDER: projects/593997455442/locations/global/workloadIdentityPools/my-github-pool/providers/my-github-pool-provider
   SERVICE_ACCOUNT_EMAIL: my-github-sa@$test-project-373118.iam.gserviceaccount.com
   REGISTRY_URL: asia-northeast1-docker.pkg.dev/test-project-373118/my-repository
 

@@ -18,7 +18,7 @@ $ gcloud iam workload-identity-pools undelete my-github-pool --location global -
 $ gcloud iam workload-identity-pools providers undelete my-github-pool-provider --workload-identity-pool my-github-pool --location global --project test-project-373118
 # もし依存関係でエラーが起こった場合は、先にterraform applyしてから再度試す。
 $ terraform import google_iam_workload_identity_pool.github_pool projects/test-project-373118/locations/global/workloadIdentityPools/my-github-pool
-$ terraform import google_iam_workload_identity_pool_provider.github_provider_jwt projects/test-project-373118/locations/global/workloadIdentityPools/my-github-pool/providers/my-github-pool-provider
+$ terraform import google_iam_workload_identity_pool_provider.github_pool_provider projects/test-project-373118/locations/global/workloadIdentityPools/my-github-pool/providers/my-github-pool-provider
 ```
 
 ### クラスタ接続
