@@ -26,9 +26,9 @@ server:
     kustomize.buildOptions: --load-restrictor LoadRestrictionsNone
   service:
     type: NodePort
-    annotations:  # GCP LB BackendConfig
-      cloud.google.com/backend-config: '{"ports": {"http":"argocd-backend-config"}}'
-      cloud.google.com/neg: '{"ingress": true}'
+    # annotations:  # GCP LB BackendConfig
+    #   cloud.google.com/backend-config: '{"ports": {"http":"argocd-backend-config"}}'
+    #   cloud.google.com/neg: '{"ingress": true}'
 controller:
   enableStatefulSet: true
   resources:
@@ -96,14 +96,24 @@ configs:
     admin.enabled: false
     # dex.config: |
     #   connectors:
-    #     - type: gitlab
-    #       id: gitlab
-    #       name: Gitlab
+    #     - type: github
+    #       id: github
+    #       name: github
     #       config:
     #         clientID: xxxxx
     #         clientSecret: xxxxx
+    #         orgs:
+    #           - argoproj
   rbac:
-    policy.csv: |
-      p, hoge@example.com, applications, *, */*, allow
-      g, example/group, role:admin
-    policy.default: role:readonly
+    policy.default: ''
+    scopes: "[email, groups]"
+  #   policy.csv: |
+  #     p, hoge@example.com, applications, *, */*, allow
+  #     p, role:org-admin, applications, *, */*, allow
+  #     p, role:org-admin, clusters, get, *, allow
+  #     p, role:org-admin, repositories, *, *, allow
+  #     p, role:org-admin, logs, get, *, allow
+  #     p, role:org-admin, exec, create, */*, allow
+  #     g, your-github-org:your-team, role:org-admin
+  #     g, your-github-org:your-team, role:admin
+  #     g, user01@mycompany.com, role:admin  # 個人アカウントの場合、これがよい

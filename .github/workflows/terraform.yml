@@ -1,0 +1,79 @@
+name: "terraform"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "terraform/**"
+  pull_request:
+    branches:
+      - main
+      - develop
+    types:
+      - opened
+      - synchronize
+    paths:
+      - "terraform/**"
+
+defaults:
+  run:
+    working-directory: .
+
+# env:
+#   WORKLOAD_IDENTITY_PROVIER: "projects/xxxxxxxxxx/locations/global/workloadIdentityPools/xxxxxxxxxxxxx/providers/xxxxxxxxx"
+#   SERVICE_ACCOUNT: "github-actions-cicd@{PROJECT_ID}.iam.gserviceaccount.com"
+#   TERRAFORM_VERSION: "1.9.0"
+
+jobs:
+  Bench:
+    name: "Terraform Job"
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # - id: 'auth'
+      #   name: 'Authenticate to Google Cloud'
+      #   uses: 'google-github-actions/auth@v1'
+      #   with:
+      #     workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIER }}
+      #     service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      # - uses: hashicorp/setup-terraform@v3
+      #   with:
+      #     terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      # - name: Terraform fmt
+      #   id: fmt
+      #   run: terraform fmt -recursive -check
+      #   continue-on-error: true
+
+      # - name: Terraform Init
+      #   id: init
+      #   run: terraform init
+
+      # - name: Terraform Validate
+      #   id: validate
+      #   run: terraform validate -no-color
+
+      # - name: Terraform Plan
+      #   id: plan
+      #   run: terraform plan -no-color
+      #   continue-on-error: true
+
+      # - name: Terraform Plan Status
+      #   if: steps.plan.outcome == 'failure'
+      #   run: exit 1
+
+      # - name: Terraform Apply
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   run: terraform apply -auto-approve -input=false

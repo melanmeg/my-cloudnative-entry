@@ -18,7 +18,7 @@ spec:
       serviceAccountName: welcome-study-sa
       containers:
       - name: welcome-study
-        image: asia-northeast1-docker.pkg.dev/PROJECT_ID/my-repository/welcome-study-app:latest
+        image: asia-northeast1-docker.pkg.dev/test-project-373118/my-repository/welcome-study-app:latest
         ports:
         - containerPort: 8080
         resources:

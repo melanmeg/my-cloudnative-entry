@@ -1,5 +1,4 @@
 locals {
-  # common
   region         = "asia-northeast1"
   zones          = ["asia-northeast1-a"]
   labels = {
@@ -12,10 +11,6 @@ locals {
   master_authorized_networks = [
     {
       cidr_block   = var.authorized_networks[0] # 承認済みネットワークのアドレス範囲設定
-      display_name = "VPC"
-    },
-    {
-      cidr_block   = var.authorized_networks[1] # 承認済みネットワークのアドレス範囲設定
       display_name = "VPC"
     }
   ]
@@ -64,8 +59,4 @@ locals {
 
   # GKEクラスタ定期削除
   schedule = "0 22 * * *" # 毎日22時に削除
-
-  # gitlab
-  gitlab_project_id = var.gitlab_project_id # GitLabのプロジェクトID
-  gitlab_url        = "https://gitlab.com"
 }
