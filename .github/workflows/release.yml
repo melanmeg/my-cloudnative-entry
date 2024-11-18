@@ -1,0 +1,91 @@
+name: "release"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "app/**"
+  pull_request:
+    branches:
+      - main
+      - develop
+    types:
+      - opened
+      - synchronize
+    paths:
+      - "app/**"
+
+defaults:
+  run:
+    working-directory: ./app
+
+env:
+  GO_VERSION: 1.23.2
+  IMAGE: welcome-study-app
+  WORKLOAD_IDENTITY_PROVIDER: projects/593997455442/locations/global/workloadIdentityPools/my-gitlab-pool/providers/my-gitlab-pool-provider
+  SERVICE_ACCOUNT_EMAIL: my-github-sa@$test-project-373118.iam.gserviceaccount.com
+  REGISTRY_URL: asia-northeast1-docker.pkg.dev/test-project-373118/my-repository
+
+jobs:
+  go_test:
+    name: "Go Test Job"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+  build_image:
+    name: "Build Image Job"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # setup
+      - name: GCP Authenticate
+        uses: google-github-actions/auth@v2
+        with:
+          service_account: ${{ env.SERVICE_ACCOUNT_EMAIL }}
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+
+      - name: Authorize Docker push
+        run: |
+          gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+
+      # build image
+      - name: Set up buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v3
+        with:
+          file: ${{ steps.yarn.outputs.location }}/Dockerfile
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY_URL }}/${{ env.IMAGE }}:latest
+            ${{ env.REGISTRY_URL }}/${{ env.IMAGE }}:${{ github.sha }}
+
+      # scan image
+      - name: trivy scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'go_code'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'

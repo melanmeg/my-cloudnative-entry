@@ -4,7 +4,7 @@
 
 ```bash
 project_id          = "test-project-373118"
-project_number      = "xxxxxxxxxxxx"
+project_number      = "593997455442"
 owner               = "melanmeg"
 authorized_networks = ["X.X.X.X/32"]
 github_repository   = "melanmeg/my-cloudnative-entry"
