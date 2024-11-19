@@ -7,7 +7,7 @@ WORDPRESS_DB_PASSWORD=db-password
 
 # バケット作成
 gsutil mb -l asia-northeast1 gs://$BACKEND_BUCKT_NAME
-gcloud storage buckets update gs://$BACKEND_BUCKT_NAME --versioning --lifecycle-file=./lifecycle_config.json
+gcloud storage buckets update gs://$BACKEND_BUCKT_NAME --versioning --uniform-bucket-level-access --lifecycle-file=./lifecycle_config.json
 
 # シークレット作成
 echo -n $WORDPRESS_USER_PASSWORD > user-password.secret  # wordpressログインユーザーのパスワード

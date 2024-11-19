@@ -55,14 +55,10 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
       - id: fmt
-        run: |
-          set -x
-          terraform fmt -recursive -check
+        run: terraform fmt -recursive -check
         continue-on-error: true
       - id: init
-        run: |
-          set -x
-          terraform init
+        run: terraform init
       - id: validate
         run: terraform validate -no-color
       - id: plan
