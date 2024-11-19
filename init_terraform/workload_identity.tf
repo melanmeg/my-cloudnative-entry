@@ -41,3 +41,17 @@ resource "google_storage_bucket_iam_member" "storage_object_admin" {
   role   = "roles/storage.objectAdmin"
   member = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${local.github_repository}"
 }
+
+# GKEクラスターに対するIAM権限を付与
+resource "google_project_iam_member" "container_viewer" {
+  project = local.project_id
+  role    = "roles/container.viewer"
+  member  = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${local.github_repository}"
+}
+
+# Cloud KMSに対する権限を付与
+resource "google_project_iam_member" "kms_decrypt_permission" {
+  project = local.project_id
+  role    = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member  = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${local.github_repository}"
+}
