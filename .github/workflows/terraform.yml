@@ -1,36 +1,42 @@
+# ref:
+#   - https://gihyo.jp/article/2024/10/good-practices-for-github-actions
+#   - https://zenn.dev/tmknom/articles/github-cicd-book#faq
+
 name: "terraform"
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-      - develop
-    paths:
-      - "terraform/**"
+    branches: [main, develop]
+    paths: ['terraform/**']
   pull_request:
-    branches:
-      - main
-      - develop
-    types:
-      - opened
-      - synchronize
-    paths:
-      - "terraform/**"
+    branches: [main, develop]
+    types: [opened, synchronize]
+    paths: ['terraform/**']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 defaults:
   run:
-    working-directory: .
+    shell: bash
+    working-directory: terraform
 
-# env:
-#   WORKLOAD_IDENTITY_PROVIER: "projects/xxxxxxxxxx/locations/global/workloadIdentityPools/xxxxxxxxxxxxx/providers/xxxxxxxxx"
-#   SERVICE_ACCOUNT: "github-actions-cicd@{PROJECT_ID}.iam.gserviceaccount.com"
-#   TERRAFORM_VERSION: "1.9.0"
+permissions: {}
+
+env:
+  PROJECT_ID: test-project-373118
+  PROJECT_NUMBER: 593997455442
+  WORKLOAD_IDENTITY_POOL: my-github-pool
+  WORKLOAD_IDENTITY_POOL_PROVIDER: my-github-pool-provider
+  TERRAFORM_VERSION: 1.1.7
 
 jobs:
   Bench:
     name: "Terraform Job"
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     permissions:
       contents: read
@@ -38,42 +44,37 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      # - id: 'auth'
-      #   name: 'Authenticate to Google Cloud'
-      #   uses: 'google-github-actions/auth@v1'
-      #   with:
-      #     workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIER }}
-      #     service_account: ${{ env.SERVICE_ACCOUNT }}
+      - uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ env.WORKLOAD_IDENTITY_POOL }}/providers/${{ env.WORKLOAD_IDENTITY_POOL_PROVIDER }}
 
-      # - uses: hashicorp/setup-terraform@v3
-      #   with:
-      #     terraform_version: ${{ env.TERRAFORM_VERSION }}
-
-      # - name: Terraform fmt
-      #   id: fmt
-      #   run: terraform fmt -recursive -check
-      #   continue-on-error: true
-
-      # - name: Terraform Init
-      #   id: init
-      #   run: terraform init
-
-      # - name: Terraform Validate
-      #   id: validate
-      #   run: terraform validate -no-color
-
-      # - name: Terraform Plan
-      #   id: plan
-      #   run: terraform plan -no-color
-      #   continue-on-error: true
-
-      # - name: Terraform Plan Status
-      #   if: steps.plan.outcome == 'failure'
-      #   run: exit 1
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+      - id: fmt
+        run: |
+          set -x
+          terraform fmt -recursive -check
+        continue-on-error: true
+      - id: init
+        run: |
+          set -x
+          terraform init
+      - id: validate
+        run: terraform validate -no-color
+      - id: plan
+        run: |
+          set -x
+          terraform plan -no-color
+        continue-on-error: true
+      - if: steps.plan.outcome == 'failure'
+        run: exit 1
 
       # - name: Terraform Apply
       #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #   run: terraform apply -auto-approve -input=false
+      #   run: |
+      #     set -x
+      #     terraform apply -auto-approve -input=false
