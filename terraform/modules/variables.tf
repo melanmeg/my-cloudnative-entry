@@ -10,10 +10,6 @@ variable "owner" {
   type        = string
   sensitive   = false
 }
-variable "github_repository" {
-  type        = string
-  sensitive   = false
-}
 variable "bucket_name" {
   type        = string
   sensitive   = false
