@@ -1,0 +1,2 @@
+creation_rules:
+  - gcp_kms: projects/test-project-373118/locations/global/keyRings/sops/cryptoKeys/sops-key

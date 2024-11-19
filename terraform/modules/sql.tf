@@ -44,7 +44,7 @@ resource "google_sql_database" "default" {
 resource "google_sql_user" "default" {
   name            = var.db_user
   instance        = google_sql_database_instance.default.name
-  password        = var.db_password
+  password        = local.db_password
   host            = "%"
   deletion_policy = "ABANDON" # SQL ロールが付与されているユーザーを API から削除できない Postgres で役立つ
 }

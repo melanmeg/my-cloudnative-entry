@@ -1,20 +1,21 @@
 ### 事前準備
 
-- terraform/terraform.tfvarsを用意
+- `terraform/env/secret.enc.json`を用意
 
-```bash
-project_id          = "test-project-373118"
-project_number      = "593997455442"
-owner               = "melanmeg"
-authorized_networks = ["X.X.X.X/32"]
-github_repository   = "melanmeg/my-cloudnative-entry"
-
-# Cloud SQL用、パスワード情報
-db_user     = "db-user"
-db_password = "db-password"
+```json
+{
+  "authorized_networks": ["x.x.x.x/32"],
+  "db": {
+    "password": "DB_PASSWORD"
+  }
+}
 ```
 
-- terraform/provider.tfにbackendを設定する
+```bash
+$ sops -e -i ../terraform/env/secret.enc.json
+```
+
+- `terraform/provider.tf`にbackendを設定する
 ```tf
 terraform {
   backend "gcs" {

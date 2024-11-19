@@ -1,3 +1,7 @@
+data "sops_file" "secret" {
+  source_file = "secret.enc.json"
+}
+
 locals {
   region         = "asia-northeast1"
   zones          = ["asia-northeast1-a"]
@@ -7,10 +11,12 @@ locals {
     "owner" : var.owner
   }
 
+  db_password = data.sops_file.secret.data["db.password"]
+
   # authorized networks
   master_authorized_networks = [
     {
-      cidr_block   = var.authorized_networks[0] # 承認済みネットワークのアドレス範囲設定
+      cidr_block   = data.sops_file.secret.data["authorized_network"] # 承認済みネットワークのアドレス範囲設定
       display_name = "VPC"
     }
   ]
@@ -50,7 +56,7 @@ locals {
       match = {
         versioned_expr = "SRC_IPS_V1"
         config = {
-          src_ip_ranges = [var.authorized_networks[0]]
+          src_ip_ranges = [data.sops_file.secret.data["authorized_network"]]
         }
       }
       description = "Allow access to VPC"

@@ -4,10 +4,10 @@ terraform {
       source  = "hashicorp/google"
       version = "6.1.0"
     }
-  }
-  backend "gcs" {
-    bucket  = "test-project-373118-tfstate-bucket"
-    prefix  = "test-project-373118/state"
+    sops = {
+      source = "carlpett/sops"
+      version = "~> 0.5"
+    }
   }
 }
 
