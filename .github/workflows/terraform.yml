@@ -8,11 +8,11 @@ on:
   workflow_dispatch:
   push:
     branches: [main, develop]
-    paths: ['terraform/**']
+    paths: ['test-terraform/**']
   pull_request:
     branches: [main, develop]
     types: [opened, synchronize]
-    paths: ['terraform/**']
+    paths: ['test-terraform/**']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
