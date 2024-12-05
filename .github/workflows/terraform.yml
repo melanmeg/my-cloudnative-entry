@@ -1,7 +1,3 @@
-# ref:
-#   - https://gihyo.jp/article/2024/10/good-practices-for-github-actions
-#   - https://zenn.dev/tmknom/articles/github-cicd-book#faq
-
 name: "terraform"
 
 on:
@@ -31,6 +27,7 @@ env:
   WORKLOAD_IDENTITY_POOL: my-github-pool
   WORKLOAD_IDENTITY_POOL_PROVIDER: my-github-pool-provider
   TERRAFORM_VERSION: 1.9.2
+  TFCMT_VERSION: 4.13.0
 
 jobs:
   Bench:
@@ -54,26 +51,37 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
-      # - id: fmt
-      #   run: terraform fmt -recursive -check
-      #   continue-on-error: true
-      - id: init
+
+      # fmt
+      - name: fmt
+        run: terraform fmt -recursive -check
+        continue-on-error: true
+
+      # init
+      - name: init
         run: terraform init
-      - id: validate
+
+      # validate
+      - name: validate
         run: terraform validate -no-color
-      - id: plan
-        run: terraform plan -no-color
-        # continue-on-error: true
 
-      # - run: echo ${{ steps.plan.outputs.stdout }}
-      # - run: echo ${{ steps.plan.outputs.stderr }}
-      # - run: echo ${{ steps.plan.outputs.exitcode }}
+      - uses: shmokmt/actions-setup-tfcmt@v2
+        with:
+          version: v${{ env.TFCMT_VERSION }}
 
-      # - if: steps.plan.outcome == 'failure'
-      #   run: exit 1
+      # plan
+      - name: terraform plan
+        id: plan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: tfcmt --config tfcmt.yml plan -patch -- terraform plan -no-color -input=false
+        continue-on-error: true
+      - if: steps.plan.outcome == 'failure'
+        run: exit 1
 
-      # - name: Terraform Apply
-      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #   run: |
-      #     set -x
-      #     terraform apply -auto-approve -input=false
+      # apply
+      - name: terraform apply
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: tfcmt --config tfcmt.yml apply -- terraform apply -no-color -input=false -auto-approve
