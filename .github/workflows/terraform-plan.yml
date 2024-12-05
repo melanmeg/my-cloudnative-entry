@@ -17,7 +17,7 @@ concurrency:
 defaults:
   run:
     shell: bash
-    working-directory: terraform/env
+    working-directory: test-terraform
 
 permissions: {}
 
@@ -30,8 +30,7 @@ env:
   TFCMT_VERSION: 4.13.0
 
 jobs:
-  Bench:
-    name: "Terraform Job"
+  terraform-plan:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -78,10 +77,3 @@ jobs:
         continue-on-error: true
       - if: steps.plan.outcome == 'failure'
         run: exit 1
-
-      # apply
-      - name: terraform apply
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: tfcmt --config tfcmt.yml apply -- terraform apply -no-color -input=false -auto-approve
