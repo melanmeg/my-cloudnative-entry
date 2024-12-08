@@ -41,6 +41,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          clean: false
+          ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - uses: google-github-actions/auth@v2
         with:
