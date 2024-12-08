@@ -1,4 +1,4 @@
-name: "terraform"
+name: "terraform-plan"
 
 on:
   workflow_dispatch:
@@ -74,6 +74,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: tfcmt --config tfcmt.yml plan -patch -- terraform plan -no-color -input=false
-        continue-on-error: true
-      - if: steps.plan.outcome == 'failure'
-        run: exit 1
