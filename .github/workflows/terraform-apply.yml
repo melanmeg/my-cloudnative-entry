@@ -1,10 +1,8 @@
 name: "terraform-apply"
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [main, develop]
-    paths: ['test_terraform/**']
+  issue_comment:
+    types: [created]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,7 +13,7 @@ defaults:
     shell: bash
     working-directory: test_terraform
 
-permissions: {}
+# permissions: {}
 
 env:
   PROJECT_ID: test-project-373118
@@ -27,20 +25,25 @@ env:
 
 jobs:
   terraform-apply:
+    if: contains(github.event.comment.body, '/apply ci')
+    # if: github.event.issue.pull_request != '' && contains(fromJSON('["melanmeg"]'), github.event.comment.user.login)
+
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    # if: github.event.issue.pull_request != '' && contains(fromJSON('["melanmeg"]'), github.event.comment.user.login)
     permissions:
       id-token: write
       contents: write
       pull-requests: write
       # issues: write
-      # actions: write
-      # checks: read
+      actions: write
+      checks: read
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          clean: false
+          ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - uses: google-github-actions/auth@v2
         with:
@@ -72,5 +75,8 @@ jobs:
       - name: terraform apply
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TFCMT_REPO_OWNER: ${{ github.event.organization.name }}
+          TFCMT_REPO_NAME: ${{ github.event.repository.name }}
+          TFCMT_PR_NUMBER: ${{ github.event.issue.number }}
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: tfcmt --config tfcmt.yml apply -- terraform apply -no-color -input=false -auto-approve
