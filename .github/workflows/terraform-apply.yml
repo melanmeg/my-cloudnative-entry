@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    if: github.event.issue.pull_request != '' && contains(fromJSON('["melanmeg"]'), github.event.comment.user.login)
+    # if: github.event.issue.pull_request != '' && contains(fromJSON('["melanmeg"]'), github.event.comment.user.login)
     permissions:
       id-token: write
       contents: write
