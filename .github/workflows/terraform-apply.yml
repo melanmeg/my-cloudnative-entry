@@ -13,7 +13,7 @@ defaults:
     shell: bash
     working-directory: test_terraform
 
-permissions: {}
+# permissions: {}
 
 env:
   PROJECT_ID: test-project-373118
