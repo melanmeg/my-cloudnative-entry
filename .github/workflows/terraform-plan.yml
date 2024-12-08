@@ -2,9 +2,6 @@ name: "terraform-plan"
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main, develop]
-    paths: ['test_terraform/**']
   pull_request:
     branches: [main, develop]
     types: [opened, synchronize]
