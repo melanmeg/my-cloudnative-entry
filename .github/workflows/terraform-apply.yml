@@ -11,7 +11,7 @@ concurrency:
 defaults:
   run:
     shell: bash
-    working-directory: test-iam
+    working-directory: test-cost
 
 permissions: {}
 
