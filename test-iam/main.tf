@@ -22,6 +22,6 @@ resource "google_project_iam_binding" "bigquery_sa_binding" {
 # サービスアカウントへの権限を付与
 resource "google_service_account_iam_member" "bigquery_sa_permission" {
   service_account_id = google_service_account.bigquery_sa.id
-  role               = "roles/iam.serviceAccountUser" # 必要なIAMロールを指定
-  member             = "serviceAccount:cost-monitoring-sa@test-project-373118.iam.gserviceaccount.com"
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "principalSet://iam.googleapis.com/projects/593997455442/locations/global/workloadIdentityPools/my-github-pool/attribute.repository/melanmeg/my-cloudnative-entry"
 }
