@@ -1,0 +1,9 @@
+{
+  "type": "commonjs",
+  "dependencies": {
+    "@google-cloud/bigquery": "^7.9.1",
+    "@google-cloud/functions-framework": "^3.4.2",
+    "@google-cloud/secret-manager": "^5.6.0",
+    "@slack/web-api": "^7.7.0"
+  }
+}
