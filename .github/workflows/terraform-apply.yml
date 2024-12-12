@@ -11,7 +11,7 @@ concurrency:
 defaults:
   run:
     shell: bash
-    working-directory: test-project-iam
+    working-directory: test-iam
 
 permissions: {}
 
