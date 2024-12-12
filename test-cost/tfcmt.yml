@@ -1,0 +1,154 @@
+# https://zenn.dev/bm_sms/articles/b1e4778f5b40e9 のものを利用
+
+embedded_var_names: []
+templates:
+  plan_title: "## {{if eq .ExitCode 1}}:x: {{end}}Plan結果{{if .Vars.target}} ({{.Vars.target}}){{end}}"
+  apply_title: "## :{{if eq .ExitCode 0}}white_check_mark{{else}}x{{end}}: Apply結果{{if .Vars.target}} ({{.Vars.target}}){{end}}"
+
+  result: "{{if .Result}}**{{ .Result }}**{{end}}"
+  # ↓ 視認しやすいよう、diff highlightを使って色をつける https://stackoverflow.com/a/39413824/4006322
+  updated_resources: |
+    {{if .CreatedResources}}
+    @@ Create @@
+    {{- range .CreatedResources}}
+    + {{avoidHTMLEscape .}}
+    {{- end}}{{end}}{{if .UpdatedResources}}
+    @@ Update @@
+    {{- range .UpdatedResources}}
+    ! {{avoidHTMLEscape .}}
+    {{- end}}{{end}}{{if .DeletedResources}}
+    @@ Delete @@
+    {{- range .DeletedResources}}
+    - {{avoidHTMLEscape .}}
+    {{- end}}{{end}}{{if .ReplacedResources}}
+    @@ Replace @@
+    {{- range .ReplacedResources}}
+    - {{avoidHTMLEscape .}}
+    {{- end}}{{end}}{{if .ImportedResources}}
+    @@ Import @@
+    {{- range .ImportedResources}}
+    ! {{avoidHTMLEscape .}}
+    {{- end}}{{end}}{{if .MovedResources}}
+    @@ Move @@
+    {{- range .MovedResources}}
+    ! {{avoidHTMLEscape .Before}} => {{avoidHTMLEscape .After}}
+    {{- end}}{{end}}
+  deletion_warning: |
+    {{ if or .DeletedResources .UpdatedResources .ReplacedResources }}
+    ### :warning: リソース変更・削除が発生します :warning:
+
+    ```diff
+    {{if .UpdatedResources}}
+    @@ Update @@
+    {{- range .UpdatedResources}}
+    ! {{avoidHTMLEscape .}}
+    {{- end}}{{end}}{{if .DeletedResources}}
+    @@ Delete @@
+    {{- range .DeletedResources}}
+    - {{avoidHTMLEscape .}}
+    {{- end}}{{end}}{{if .ReplacedResources}}
+    @@ Replace @@
+    {{- range .ReplacedResources}}
+    - {{avoidHTMLEscape .}}
+    {{- end}}{{end}}
+    ```
+
+    {{end}}
+  changed_result: |
+    {{if .ChangedResult}}
+    <details><summary>planの差分詳細はこちら</summary>
+    {{wrapCode .ChangedResult}}
+    </details>
+    {{end}}
+  change_outside_terraform: |
+    {{if .ChangeOutsideTerraform}}
+    <details><summary>:information_source: Terraform外で変更されたオブジェクト</summary>
+
+    {{wrapCode .ChangeOutsideTerraform}}
+    </details>
+    {{end}}
+  error_messages: |
+    {{if .ErrorMessages}}
+    ## :warning: Errors
+    {{range .ErrorMessages}}
+    * {{. -}}
+    {{- end}}{{end}}
+  guide_apply_failure: ""
+  guide_apply_parse_error: ""
+terraform:
+  plan:
+    disable_label: false
+    template: |
+      {{template "plan_title" .}}
+
+      {{template "result" .}}
+      {{template "deletion_warning" .}}
+
+      <details><summary>リソースごとの変更内容の要約はこちら</summary>
+
+      ```diff
+      {{template "updated_resources" .}}
+      ```
+
+      </details>
+
+      {{template "changed_result" .}}
+      {{template "change_outside_terraform" .}}
+      {{template "error_messages" .}}
+
+      {{if .Link}}[GitHub Actions上の実行詳細へのリンク]({{.Link}}){{end}}
+    when_add_or_update_only:
+      label: "{{if .Vars.target}}{{.Vars.target}}/{{end}}add-or-update"
+      label_color: 1d76db # blue
+      # disable_label: false
+    when_destroy:
+      label: "{{if .Vars.target}}{{.Vars.target}}/{{end}}destroy"
+      label_color: d93f0b # red
+      # disable_label: false
+    when_no_changes:
+      label: "{{if .Vars.target}}{{.Vars.target}}/{{end}}no-changes"
+      label_color: 0e8a16 # green
+      # disable_label: false
+      # disable_comment: false
+    when_plan_error:
+      label:
+      label_color:
+      # disable_label: false
+    when_parse_error:
+      template: |
+        {{template "plan_title" .}}
+
+        {{if .Link}}[GitHub Actions上の実行詳細へのリンク]({{.Link}}){{end}}
+
+        結果のparseに失敗しました。
+
+        <details><summary>詳細はこちら</summary>
+        {{wrapCode .CombinedOutput}}
+        </details>
+  apply:
+    template: |
+      {{template "apply_title" .}}
+
+      {{if .Link}}[GitHub Actions上の実行詳細へのリンク]({{.Link}}){{end}}
+
+      {{if ne .ExitCode 0}}{{template "guide_apply_failure" .}}{{end}}
+
+      {{template "result" .}}
+
+      <details><summary>詳細はこちら</summary>
+      {{wrapCode .CombinedOutput}}
+      </details>
+      {{template "error_messages" .}}
+    when_parse_error:
+      template: |
+        {{template "apply_title" .}}
+
+        {{if .Link}}[GitHub Actions上の実行詳細へのリンク]({{.Link}}){{end}}
+
+        {{template "guide_apply_parse_error" .}}
+
+        結果のparseに失敗しました。
+
+        <details><summary>詳細はこちら</summary>
+        {{wrapCode .CombinedOutput}}
+        </details>
