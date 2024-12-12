@@ -11,7 +11,7 @@ concurrency:
 defaults:
   run:
     shell: bash
-    working-directory: test_terraform
+    working-directory: test-project-iam
 
 permissions: {}
 
