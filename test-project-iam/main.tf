@@ -5,7 +5,7 @@ module "cost-monitoring" {
   name        = "cost-monitoring"
   description = "For cost monitoring"
 
-  schedule          = "0 8 * * 1-5"  # 平日朝8時に実行
+  schedule          = "0 9 * * *"  # 毎日朝8時に実行
   runtime           = "nodejs20"
   entry_point       = "send_slack_notify"
   target_dataset_id = "test_billing_dataset"
