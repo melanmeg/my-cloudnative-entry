@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [main, develop]
     types: [opened, synchronize]
-    paths: ['*']
+    paths: ['**']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
