@@ -55,4 +55,5 @@ $ helm uninstall argocd && \
 
 $ kubectl delete ingress --all -A
 $ terraform destroy -var-file="db.tfvars" --auto-approve
+
 ```
