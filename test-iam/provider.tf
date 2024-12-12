@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "google" {
-  project        = "test-project-373118" # "my-project-melanmeg"
+  project        = "my-project-melanmeg"  # "test-project-373118"
   region         = "ap-northeast-1"
   zone           = "ap-northeast-1a"
 }
