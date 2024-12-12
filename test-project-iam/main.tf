@@ -25,6 +25,6 @@ module "cost-monitoring-sa" {
   }
   roles = [
     "roles/secretmanager.secretAccessor",
-    "roles/bigquery.jobUser"
+    # "roles/bigquery.jobUser"
   ]
 }
